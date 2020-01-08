@@ -1,0 +1,19 @@
+﻿@model DepartmentRating.DataBase.Admin
+
+<div class="text-center">
+    <h1>Добавить администретора</h1>
+
+    <div>
+        <form asp-controller="Home" asp-action="AdminsAdd" method="post">
+            <input type="hidden" asp-for="AdminId" />
+            <div asp-validation-summary="All"></div>
+            <div>
+                <label asp-for="Name"></label>
+                <input asp-for="Name"/>
+                <span asp-validation-for="Name"></span>
+            </div>
+            <input type="submit" value="Готово!"/>
+        </form>
+    </div>
+</div>
+

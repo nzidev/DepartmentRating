@@ -1,0 +1,157 @@
+﻿@using DepartmentRating.DataBase
+@model DepartmentRating.DataBase.ViewModel
+@using Microsoft.AspNetCore.Identity
+
+@{
+    ViewData["Title"] = "Home Page";
+
+}
+
+<p>Hello @DepartmentRating.Models.Options.ActiveDirectoryOptions.IsMember(User.Identity.Name)</p>
+<p>@DepartmentRating.Models.Options.ActiveDirectoryOptions.AccessGroupName</p>
+
+    @if(@DepartmentRating.Models.Options.ActiveDirectoryOptions.IsMember(User.Identity.Name))
+    {
+    <div>
+
+        <div class="text-center">
+
+
+
+            @if (Model.IsAdmin())
+            {
+            @using (Html.BeginForm("MainAdd", "Home", FormMethod.Post))
+                {
+            @Html.DropDownList("DropDownUsers", new SelectList(Model.Users, "UserId", "Fio"), " ")
+            @Html.DropDownList("DropDownOffences", new SelectList(Model.Offences, "OffenceId", "Name"), " ")
+            @Html.TextBox("Description", "")
+            <input type="submit" value="Добавить" />
+                }
+            }
+            else
+            {
+            @Html.DropDownList("DropDownUsers", new SelectList(Model.Users, "UserId", "Fio"), " ", new { @class = "form-control ", @style = "display:none" })
+            @Html.DropDownList("DropDownOffences", new SelectList(Model.Offences, "OffenceId", "Name"), " ", new { @class = "form-control ", @style = "display:none" })
+            }
+            <table class="table table-bordered table-responsive table-hover">
+
+                @foreach (Main entity in Model.Mains)
+                {
+                <tr>
+                    <td>@entity.User.Fio</td>
+                    <td>@entity.Offence.Name</td>
+                    <td>@entity.Description</td>
+                    <td>@entity.Date</td>
+                </tr>
+                }
+
+            </table>
+            @if (Model.IsAdmin())
+            {
+            <div class="text-center">
+                @using (Html.BeginForm("ResetMain", "Home", FormMethod.Post))
+                    {
+                <input type="submit" value="Сбросить рейтинг" onclick="if ( ! UserDeleteConfirmation()) return false;" />
+                    }
+
+                @*@using (Html.BeginForm("Excel", "Home", FormMethod.Post))
+                    {
+                        <input type="submit" value="Сохранить в Excel" />
+                    }*@
+            </div>
+            }
+
+        </div>
+
+
+
+        @if (Model.IsAdmin())
+        {
+        <div class="text-center">
+            <table class="table table-bordered table-responsive table-hover">
+                @foreach (Offence entity in Model.Offences)
+                    {
+                <tr>
+                    <td>@entity.Name</td>
+                    <td>@entity.Cost</td>
+                    <td>
+                        <form method="post" asp-controller="Home" asp-action="OffenceDelete">
+                            <input type="hidden" value="@entity.OffenceId" name="Id" />
+                            <input type="submit" value="Удалить" />
+                        </form>
+                    </td>
+                </tr>
+                    }
+                <tr>
+                    @using (Html.BeginForm("OffenceAdd", "Home", FormMethod.Post))
+                        {
+                    <td>@Html.TextBox("Name", "")</td>
+                    <td>@Html.TextBox("Cost", "")</td>
+
+                    <td><input type="submit" value="Добавить" /></td>
+                }
+                </tr>
+            </table>
+        </div>
+        }
+        @if (Model.IsAdmin())
+        {
+        <div class="text-center">
+            <table class="table table-bordered table-responsive table-hover">
+                @foreach (Admin entity in Model.Admins)
+                    {
+                <tr>
+                    <td>@entity.Name</td>
+                    <td>
+                        <form method="post" asp-controller="Home" asp-action="AdminDelete">
+                            <input type="hidden" value="@entity.AdminId" name="Id" />
+                            <input type="submit" value="Удалить" onclick="if ( ! AdminDeleteConfirmation()) return false;" />
+                        </form>
+                    </td>
+                </tr>
+                    }
+                <tr>
+                    @using (Html.BeginForm("AdminsAdd", "Home", FormMethod.Post))
+                    {
+                    <td>@Html.TextBox("Name", "")</td>
+
+                    <td><input type="submit" value="Добавить" /></td>
+                    }
+                </tr>
+            </table>
+
+
+        </div>
+        }
+
+        <div>
+            <table class="table table-bordered table-responsive table-hover">
+                <tr>
+                    <th>Name</th>
+                    <th>Account</th>
+                    <th>Rating</th>
+                </tr>
+                @foreach (User entity in Model.Users.OrderBy(item => item.Rating))
+                    {
+                <tr>
+                    <td>@entity.Fio</td>
+                    <td>@entity.Account</td>
+                    <td>@entity.Rating</td>
+                </tr>
+
+                    }
+            </table>
+        </div>
+
+
+    </div>
+    }
+    <script type="text/javascript">
+        function UserDeleteConfirmation() {
+            return confirm("Точно сбросить рейтинг?");
+        }
+
+        function AdminDeleteConfirmation() {
+            return confirm("Точно удалить администратора?");
+        }
+    </script>

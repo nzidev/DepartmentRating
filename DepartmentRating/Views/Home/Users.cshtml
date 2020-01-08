@@ -1,0 +1,14 @@
+﻿@using DepartmentRatingDAL.Models.DataBase
+@model IQueryable<DepartmentRatingDAL.Models.DataBase.User>
+
+
+<div class="text-center">
+    @foreach (User entity in Model)
+    {
+    <div>
+        @entity.Fio
+        @entity.Account
+        @entity.Rating
+    </div>
+    }
+</div>

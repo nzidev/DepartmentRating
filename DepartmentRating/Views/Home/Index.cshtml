@@ -1,0 +1,239 @@
+﻿@using DepartmentRatingDAL.Models.DataBase
+@model DepartmentRatingDAL.Models.DataBase.ViewModel
+@using Microsoft.AspNetCore.Identity
+
+@{
+    ViewData["Title"] = "DepartmentRating";
+
+}
+
+
+    <div class="full-width-div">
+        <div class="row full-width-div">
+            <div class="full-width-div" style="height: 70px; background-color:#3e3e3e;">
+                <table class="text-center margin table-top">
+                    <tr>
+                        <td>
+                            <a href="http://contact.info.dpc.tax.nalog.ru/" title="Телефонный справочник">
+                                <img src="~/images/tel.png" class="icon-top" />
+                            </a>
+                        </td>
+                        <td>
+                            <div style="height:25px; border-left:1px solid #f0f0f0; top:7px; opacity:0.6;"> </div>
+                        </td>
+                        <td>
+                            <a href="http://al.info.dpc.tax.nalog.ru/" title="Поиск заблокированной учетной записи">
+                                <img src="~/images/block.png" class="icon-top" />
+                            </a>
+                        </td>
+                        <td>
+                            <div style="height:25px; border-left:1px solid #f0f0f0; top:7px; opacity:0.6;"> </div>
+                        </td>
+                        <td>
+                            <a href="http://backup.info.dpc.tax.nalog.ru/" title="Мониторинг BACKUP">
+                                <img src="~/images/backup.png" class="icon-top" />
+                            </a>
+                        </td>
+                        <td>
+                            <div style="height:25px; border-left:1px solid #f0f0f0; top:7px; opacity:0.6;"> </div>
+                        </td>
+                        <td>
+                            <a href="http://ldap.info.dpc.tax.nalog.ru/" title="LDAP Perfomance">
+                                <img src="~/images/LDAP.png" class="icon-top" />
+                            </a>
+                        </td>
+                        <td>
+                            <div style="height:25px; border-left:1px solid #f0f0f0; top:7px; opacity:0.6;"> </div>
+                        </td>
+                        <td>
+                            <a href="http://unix.info.dpc.tax.nalog.ru/index.php" title="Linux">
+                                <img src="~/images/linux.png" class="icon-top" />
+                            </a>
+                        </td>
+                        <td>
+                            <div style="height:25px; border-left:1px solid #f0f0f0; top:7px; opacity:0.6;"> </div>
+                        </td>
+                        <td>
+                            <a href="http://expiredobjects.info.dpc.tax.nalog.ru/" title="Просроченные УЗ">
+                                <img src="~/images/90.png" class="icon-top" />
+                            </a>
+                        </td>
+                        <td>
+                            <div style="height:25px; border-left:1px solid #f0f0f0; top:7px; opacity:0.6;"> </div>
+                        </td>
+                        <td>
+                            <a href="http://contact.info.dpc.tax.nalog.ru/gov.aspx" title="Руководство">
+                                <img src="~/images/bemb.png" class="icon-top" />
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+        @if (DepartmentRatingDAL.Models.Options.ActiveDirectoryOptions.IsMember(User.Identity.Name))
+{
+
+        <div class="full-width-div" style="position:absolute; top:70px; left:0px; width:99%">
+            <div class="row full-width-div justify-content-between">
+                <div class="col col-sm-3" style="background-color:#0074a3; box-shadow: rgba(0,0,0,0.5) 0 0 30px;">
+                    <table class="table table-danger table-bordered table-hover" style="margin-top:5px;margin-left:5px;margin-right:5px;">
+                        <tr>
+                            <th>Имя</th>
+                            <th >УЗ</th>
+                            <th>Рейтинг</th>
+                        </tr>
+                        @foreach (User entity in Model.Users.Where(x=>x.Enabled==true).OrderBy(item => item.Rating))
+                    {
+                        <tr>
+                            <td>@entity.Fio</td>
+                            <td style="font-size:10px;width:100px;">@entity.Account</td>
+                            <td>@entity.Rating</td>
+                        </tr>
+
+                    }
+                    </table>
+                    @if (Model.IsAdmin())
+                {
+                    <div class="text-right">
+                        @using (Html.BeginForm("ResetMain", "Home", FormMethod.Post))
+                        {
+                        <input type="submit" class="btn btn-danger" value="Сбросить рейтинг" onclick="if ( ! UserDeleteConfirmation()) return false;" />
+                        }
+
+                       
+                    </div>
+                    <br />
+                }
+                </div>
+                
+                <div class="col-sm-9">
+                    <div class="row">
+
+                        <div class="table-responsive" style="margin-top:10px;">
+                            @if (Model.IsAdmin())
+                        {
+                            @using (Html.BeginForm("MainAdd", "Home", FormMethod.Post))
+                            {
+                            <div class="btn btn-default form-inline">
+                                @Html.DropDownList("DropDownUsers", new SelectList(Model.Users.Where(x=>x.Enabled==true), "UserId", "Fio"), "Сотрудник", new { @class = "form-control" })
+
+                                @Html.DropDownList("DropDownOffences", new SelectList(Model.Offences, "OffenceId", "Name"), "Событие", new { @class = "form-control" })
+                                @Html.TextBox("Description", "", new { @class = "form-control" })
+                            </div>
+                            <input type="submit" class="btn btn-primary" value="V" />
+                            }
+                        }
+                        else
+                        {
+                            @Html.DropDownList("DropDownUsers", new SelectList(Model.Users, "UserId", "Fio"), " ", new { @class = "form-control ", @style = "display:none" })
+                            @Html.DropDownList("DropDownOffences", new SelectList(Model.Offences, "OffenceId", "Name"), " ", new { @class = "form-control ", @style = "display:none" })
+                        }
+                            <div class="table table-responsive" style="height:300px;">
+                                <table class="table ">
+
+                                    @foreach (Main entity in Model.Mains)
+                    {
+                                    <tr>
+                                        <td>@entity.User.Fio</td>
+                                        <td>@entity.Offence.Name</td>
+                                        <td>@entity.Description</td>
+                                        <td>@TimeZoneInfo.ConvertTimeFromUtc(entity.Date, TimeZoneInfo.FindSystemTimeZoneById(TimeZoneInfo.Local.Id))</td>
+                                    </tr>
+                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="border-top:1px solid #3e3e3e;padding-top:10px;">
+                        <div class="col-sm-8">
+                            @if (Model.IsAdmin())
+        {
+
+                            <table class="table-responsive table-hover">
+                                <tr>
+                                    <th>Событие</th>
+                                    <th>Цена</th>
+                                    <th></th>
+                                </tr>
+                                @foreach (Offence entity in Model.Offences)
+                {
+                                <tr>
+                                    <td width="85%">@entity.Name</td>
+                                    <td width="10%">@entity.Cost</td>
+                                    <td width="5%">
+                                        <form method="post" asp-controller="Home" asp-action="OffenceDelete">
+                                            <input type="hidden" value="@entity.OffenceId" name="Id" />
+                                            <input type="submit" class="btn" value="X" />
+                                        </form>
+                                    </td>
+                                </tr>
+                }
+                                <tr>
+                                    @using (Html.BeginForm("OffenceAdd", "Home", FormMethod.Post))
+                    {
+                                    <td>@Html.TextBox("Name", "", new { @class = "form-control" })</td>
+                                    <td>@Html.TextBox("Cost", "", new { @class = "form-control" })</td>
+
+                                    <td><input type="submit" class="btn btn-primary" value="V" /></td>
+                    }
+                                </tr>
+                            </table>
+
+        }
+                        </div>
+
+                        <div class="col col-md-offset-1 col-sm-3">
+                            @if (Model.IsAdmin())
+        {
+
+                            <table class="table table-bordered table-danger table-hover">
+                                <tr>
+                                    <th>Администратор</th>
+                                    <th></th>
+                                </tr>
+                                @foreach (Admin entity in Model.Admins)
+                {
+
+                                <tr>
+                                    <td>@entity.Name</td>
+                                    <td>
+                                        <form method="post" asp-controller="Home" asp-action="AdminDelete">
+                                            <input type="hidden" value="@entity.AdminId" name="Id" />
+                                            <input type="submit" class="btn btn-secondary" value="X" onclick="if ( ! AdminDeleteConfirmation()) return false;" />
+                                        </form>
+                                    </td>
+                                </tr>
+                }
+                                <tr>
+                                    @using (Html.BeginForm("AdminsAdd", "Home", FormMethod.Post))
+                    {
+                                    <td>@Html.TextBox("Name", "", new { @class = "form-control" })</td>
+
+                                    <td><input type="submit" class="btn btn-primary" value="V" /></td>
+                    }
+                                </tr>
+                            </table>
+
+
+
+        }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+    </div>
+
+<script type="text/javascript">
+    function UserDeleteConfirmation() {
+        return confirm("Точно сбросить рейтинг?");
+    }
+
+    function AdminDeleteConfirmation() {
+        return confirm("Точно удалить администратора?");
+    }
+</script>
